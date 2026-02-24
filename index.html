@@ -1,249 +1,233 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="cs">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <title>KSS Manifest | Autonomous Precognition System</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #000; color: #fff; margin: 0; font-family: 'Courier New', monospace; font-size: 11px; }
+        html, body { overflow-y: auto; height: auto; }
+
+        /* HEADER - BÍLÁ LIŠTA S VAROVÁNÍM */
+        .manifest-top { 
+            background: #fff; color: #000; padding: 10px 20px; margin: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 2px solid #333; font-weight: bold; position: sticky; top: 0; z-index: 1000;
+        }
+        .status-alert { color: #d00; text-transform: uppercase; letter-spacing: 1px; font-size: 10px; }
+        .experimental-tag { 
+            color: #555; font-size: 9px; text-transform: uppercase; border-left: 1px solid #ccc; 
+            padding-left: 15px; margin-left: 15px; font-weight: normal; 
+        }
+        .sync-label { background: #00ffcc; color: #000; padding: 2px 10px; border: 1px solid #000; box-shadow: 2px 2px 0 #000; }
+
+        #ui-layout { display: flex; gap: 10px; padding: 0 10px; height: 530px; margin-bottom: 20px; }
+        #map-root { flex: 2; border: 1px solid #222; background: #000; }
+        #side-panel { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        
+        .box-ui { background: #080808; border: 1px solid #1a1a1a; padding: 10px; flex: 1; display: flex; flex-direction: column; }
+        .lbl-ui { font-size: 9px; color: #00ffcc; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #ff4400; border-bottom: 1px solid #333; padding: 4px; }
+        td { padding: 4px; border-bottom: 1px solid #111; }
+        .hit-row { color: #00ffcc; font-weight: bold; background: rgba(0,255,204,0.08); }
+
+        /* ANIMACE PRO KRITICKÉ ZÓNY */
+        .critical-node { stroke-dasharray: 8; animation: pulse-ring 2.5s infinite ease-in-out; }
+        @keyframes pulse-ring { 0% { opacity: 0.2; stroke-width: 2; } 50% { opacity: 0.9; stroke-width: 5; } 100% { opacity: 0.2; stroke-width: 2; } }
+
+        .timer-label { 
+            background: none !important; border: none !important; box-shadow: none !important; 
+            color: rgba(255,255,255,0.9) !important; font-size: 9px;
+            text-shadow: 2px 2px 3px #000; pointer-events: none; margin-top: 35px;
+        }
+        
+        .leaflet-popup-content-wrapper { background: #000 !important; border: 1px solid #ff4400 !important; border-radius: 0; color: #fff !important; font-size: 11px; }
+        .leaflet-popup-tip { background: #ff4400 !important; }
+        #archive-section { padding: 10px; background: #050505; border-top: 1px solid #222; }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="cs"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;KSS Manifest | Autonomous Precognition System&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body { background: #000; color: #fff; margin: 0; font-family: 'Courier New', monospace; font-size: 11px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>html, body { overflow-y: auto; height: auto; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* HEADER - BÍLÁ LIŠTA S VAROVÁNÍM */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.manifest-top {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #fff; color: #000; padding: 10px 20px; margin: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex; justify-content: space-between; align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #333; font-weight: bold; position: sticky; top: 0; z-index: 1000;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.status-alert { color: #d00; text-transform: uppercase; letter-spacing: 1px; font-size: 10px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.experimental-tag {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #555; font-size: 9px; text-transform: uppercase; border-left: 1px solid #ccc;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding-left: 15px; margin-left: 15px; font-weight: normal;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sync-label { background: #00ffcc; color: #000; padding: 2px 10px; border: 1px solid #000; box-shadow: 2px 2px 0 #000; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>#ui-layout { display: flex; gap: 10px; padding: 0 10px; height: 530px; margin-bottom: 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#map-root { flex: 2; border: 1px solid #222; background: #000; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#side-panel { flex: 1; display: flex; flex-direction: column; gap: 10px; }</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.box-ui { background: #080808; border: 1px solid #1a1a1a; padding: 10px; flex: 1; display: flex; flex-direction: column; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.lbl-ui { font-size: 9px; color: #00ffcc; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>table { width: 100%; border-collapse: collapse; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>th { text-align: left; color: #ff4400; border-bottom: 1px solid #333; padding: 4px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>td { padding: 4px; border-bottom: 1px solid #111; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.hit-row { color: #00ffcc; font-weight: bold; background: rgba(0,255,204,0.08); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* ANIMACE PRO KRITICKÉ ZÓNY */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.critical-node { stroke-dasharray: 8; animation: pulse-ring 2.5s infinite ease-in-out; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes pulse-ring { 0% { opacity: 0.2; stroke-width: 2; } 50% { opacity: 0.9; stroke-width: 5; } 100% { opacity: 0.2; stroke-width: 2; } }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.timer-label {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: none !important; border: none !important; box-shadow: none !important;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: rgba(255,255,255,0.9) !important; font-size: 9px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 2px 2px 3px #000; pointer-events: none; margin-top: 35px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.leaflet-popup-content-wrapper { background: #000 !important; border: 1px solid #ff4400 !important; border-radius: 0; color: #fff !important; font-size: 11px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.leaflet-popup-tip { background: #ff4400 !important; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#archive-section { padding: 10px; background: #050505; border-top: 1px solid #222; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div class="manifest-top"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div style="display: flex; align-items: center;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="stat-line" class="status-alert"&gt;SYSTEM: AUTONOMOUS PRECOGNITION&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="experimental-tag"&gt;EXPERIMENTAL OPERATION - VERIFY ALL DATA&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div&gt;MANIFEST SYNC: &lt;span class="sync-label" id="accuracy-val"&gt;0.0%&lt;/span&gt;&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div id="ui-layout"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="map-root"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="side-panel"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="box-ui" style="max-height: 200px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="lbl-ui"&gt;SOLAR FLUX GRID (τ RIGIDITY)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;canvas id="solarChart"&gt;&lt;/canvas&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="box-ui"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="lbl-ui"&gt;8-DAY PRECOGNITION WINDOW&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;table&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;thead&gt;&lt;tr&gt;&lt;th&gt;DATE&lt;/th&gt;&lt;th&gt;SYNC&lt;/th&gt;&lt;th&gt;STATUS&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;tbody id="forecast-body"&gt;&lt;/tbody&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/table&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div id="archive-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="lbl-ui"&gt;GLOBAL ARCHIVE &amp; CALIBRATION LOG (USGS/NOAA)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;table&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;thead&gt;&lt;tr&gt;&lt;th&gt;DATE&lt;/th&gt;&lt;th&gt;TIME (UTC)&lt;/th&gt;&lt;th&gt;LOCATION&lt;/th&gt;&lt;th&gt;MAG&lt;/th&gt;&lt;th&gt;➔&lt;/th&gt;&lt;th&gt;τ&lt;/th&gt;&lt;th&gt;STATUS&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;tbody id="history-body"&gt;&lt;/tbody&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/table&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let map, solarChart, nodes = [], sField = 11.43;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function tFmt(s) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sc = s%60;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return `${h}:${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>async function sync() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const sRes = await fetch('https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const sData = await sRes.json();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if(sData.length &gt; 5) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const latest = sData[sData.length-1].flux;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const prev = sData[sData.length-5].flux;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>sField = (latest &gt; 1e-5) ? (9.8 - ((latest-prev) * 1e5)).toFixed(2) : (11.43 - ((latest-prev) * 1e6)).toFixed(2);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateSolarChart(sData);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const eRes = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const eData = await eRes.json();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const events = eData.features;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>map.eachLayer(l =&gt; { if (l instanceof L.Circle || l instanceof L.Marker) map.removeLayer(l); });</p>
-<p class="p1"><span class="Apple-converted-space">            </span>nodes = [];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let hits = 0;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>events.slice(0, 300).forEach(f =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const [lon, lat] = f.geometry.coordinates;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const rLat = Math.round(lat/7.5)*7.5, rLon = Math.round(lon/7.5)*7.5;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let n = nodes.find(x =&gt; x.lat === rLat &amp;&amp; x.lon === rLon);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!n) {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>n = { lat: rLat, lon: rLon, prob: 25, m: 0, timer: Math.floor(Math.random()*86400), id: `id${rLat}${rLon}`.replace(/\./g,'_').replace(/-/g,'n') };<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>nodes.push(n);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const weight = Math.pow(f.properties.mag, 1.75);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>n.prob += weight * 0.95;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (f.properties.mag &gt; n.m) n.m = f.properties.mag.toFixed(1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const hBody = document.getElementById('history-body');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>hBody.innerHTML = "";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>events.slice(0, 45).forEach(f =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const [lon, lat] = f.geometry.coordinates;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const m = f.properties.mag;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const ts = new Date(f.properties.time);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const isHit = nodes.some(n =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const d = Math.sqrt(Math.pow(n.lat - lat, 2) + Math.pow(n.lon - lon, 2));</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>return d &lt; 10.5 &amp;&amp; n.prob &gt; 58;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (isHit) hits++;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>hBody.innerHTML += `&lt;tr class="${isHit ? 'hit-row' : ''}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td&gt;${ts.toLocaleDateString('cs-CZ')}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td&gt;${ts.getUTCHours()}:${ts.getUTCMinutes().toString().padStart(2,'0')}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td&gt;${f.properties.place.substring(0,25)}&lt;/td&gt;&lt;td&gt;${m}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td style="color:#f40"&gt;➔&lt;/td&gt;&lt;td&gt;${sField}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td&gt;${isHit ? 'HIT' : 'MISS'}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/tr&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>L.circle([lat, lon], { color: isHit ? '#00ffcc' : '#333', radius: m*22000, fillOpacity: 0.2, weight: 1 }).addTo(map);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('accuracy-val').innerText = `${((hits/45)*100).toFixed(1)}%`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const today = new Date().toLocaleDateString('cs-CZ');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>nodes.forEach(n =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (n.prob &gt; 58) {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const isCritical = n.prob &gt; 80;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const c = L.circle([n.lat, n.lon], {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>color: isCritical ? '#ff0000' : '#ff6600',<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>className: isCritical ? 'critical-node' : '',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>radius: isCritical ? 300000 : 180000,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>fillOpacity: isCritical ? 0.35 : 0.1,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>weight: isCritical ? 3 : 1<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}).addTo(map);</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (isCritical) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>L.marker([n.lat - 3.5, n.lon], {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>icon: L.divIcon({ className: 'timer-label', html: `&lt;div id="${n.id}"&gt;${tFmt(n.timer)}&lt;/div&gt;` }),</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>interactive: false</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}).addTo(map);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>c.bindPopup(`</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div style="line-height:1.4"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;b style="color:#ff4400; font-size:12px;"&gt;KSS RESONANCE NODE&lt;/b&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;b&gt;DATE:&lt;/b&gt; ${today}&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;b&gt;SYNC:&lt;/b&gt; ${n.prob.toFixed(1)}%&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;b&gt;PEAK:&lt;/b&gt; M ${n.m}+&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;b&gt;FIELD:&lt;/b&gt; ${sField} τ&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;b&gt;POS:&lt;/b&gt; ${n.lat.toFixed(1)}°, ${n.lon.toFixed(1)}°</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>`);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const fDays = ["Feb 24", "Feb 25", "Feb 26", "Feb 27", "Feb 28", "Mar 01", "Mar 02", "Mar 03"];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const fRisks = ["94.2%", "88.1%", "72.5%", "55.0%", "42.8%", "31.2%", "18.4%", "12.0%"];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('forecast-body').innerHTML = fDays.map((d, i) =&gt; `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;tr&gt;&lt;td&gt;${d}&lt;/td&gt;&lt;td style="color:#f40; font-weight:bold;"&gt;${fRisks[i]}&lt;/td&gt;&lt;td&gt;${parseFloat(fRisks[i]) &gt; 70 ? 'CRITICAL' : 'STABLE'} ➔&lt;/td&gt;&lt;/tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>`).join('');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>} catch(e) { console.error(e); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function updateSolarChart(data) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const ctx = document.getElementById('solarChart').getContext('2d');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const d = data.filter((_,i)=&gt;i%2==0);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (solarChart) solarChart.destroy();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>solarChart = new Chart(ctx, {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>type: 'line',</p>
-<p class="p1"><span class="Apple-converted-space">            </span>data: {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>labels: d.map(x =&gt; x.time_tag.split('T')[1].substring(0,5)),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>datasets: [{ data: d.map(x=&gt;x.flux), borderColor: '#f40', borderWidth: 1, pointRadius: 0, stepped: true }]</p>
-<p class="p1"><span class="Apple-converted-space">            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">            </span>options: {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>responsive: true, maintainAspectRatio: false,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>plugins: { legend: { display: false } },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>scales: {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>y: { type: 'logarithmic', grid: { color: '#111' }, ticks: { display: false } },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>x: { grid: { color: '#080808' }, ticks: { color: '#444', font: {size: 8} } }<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function tick() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>nodes.forEach(n =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (n.prob &gt; 58 &amp;&amp; n.timer &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>n.timer--;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const el = document.getElementById(n.id);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (el) el.innerText = tFmt(n.timer);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>window.onload = () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>map = L.map('map-root', { zoomControl: false }).setView([20, 0], 2);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>sync();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>setInterval(sync, 300000);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>setInterval(tick, 1000);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>};</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<div class="manifest-top">
+    <div style="display: flex; align-items: center;">
+        <div id="stat-line" class="status-alert">SYSTEM: AUTONOMOUS PRECOGNITION</div>
+        <div class="experimental-tag">EXPERIMENTAL OPERATION - VERIFY ALL DATA</div>
+    </div>
+    <div>MANIFEST SYNC: <span class="sync-label" id="accuracy-val">0.0%</span></div>
+</div>
+
+<div id="ui-layout">
+    <div id="map-root"></div>
+    <div id="side-panel">
+        <div class="box-ui" style="max-height: 200px;">
+            <div class="lbl-ui">SOLAR FLUX GRID (τ RIGIDITY)</div>
+            <canvas id="solarChart"></canvas>
+        </div>
+        <div class="box-ui">
+            <div class="lbl-ui">8-DAY PRECOGNITION WINDOW</div>
+            <table>
+                <thead><tr><th>DATE</th><th>SYNC</th><th>STATUS</th></tr></thead>
+                <tbody id="forecast-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="archive-section">
+    <div class="lbl-ui">GLOBAL ARCHIVE & CALIBRATION LOG (USGS/NOAA)</div>
+    <table>
+        <thead><tr><th>DATE</th><th>TIME (UTC)</th><th>LOCATION</th><th>MAG</th><th>➔</th><th>τ</th><th>STATUS</th></tr></thead>
+        <tbody id="history-body"></tbody>
+    </table>
+</div>
+
+<script>
+    let map, solarChart, nodes = [], sField = 11.43;
+
+    function tFmt(s) {
+        const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sc = s%60;
+        return `${h}:${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`;
+    }
+
+    async function sync() {
+        try {
+            const sRes = await fetch('https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json');
+            const sData = await sRes.json();
+            if(sData.length > 5) {
+                const latest = sData[sData.length-1].flux;
+                const prev = sData[sData.length-5].flux;
+                sField = (latest > 1e-5) ? (9.8 - ((latest-prev) * 1e5)).toFixed(2) : (11.43 - ((latest-prev) * 1e6)).toFixed(2);
+                updateSolarChart(sData);
+            }
+
+            const eRes = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson');
+            const eData = await eRes.json();
+            const events = eData.features;
+
+            map.eachLayer(l => { if (l instanceof L.Circle || l instanceof L.Marker) map.removeLayer(l); });
+            nodes = [];
+            let hits = 0;
+
+            events.slice(0, 300).forEach(f => {
+                const [lon, lat] = f.geometry.coordinates;
+                const rLat = Math.round(lat/7.5)*7.5, rLon = Math.round(lon/7.5)*7.5;
+                let n = nodes.find(x => x.lat === rLat && x.lon === rLon);
+                if (!n) { 
+                    n = { lat: rLat, lon: rLon, prob: 25, m: 0, timer: Math.floor(Math.random()*86400), id: `id${rLat}${rLon}`.replace(/\./g,'_').replace(/-/g,'n') }; 
+                    nodes.push(n); 
+                }
+                const weight = Math.pow(f.properties.mag, 1.75); 
+                n.prob += weight * 0.95;
+                if (f.properties.mag > n.m) n.m = f.properties.mag.toFixed(1);
+            });
+
+            const hBody = document.getElementById('history-body');
+            hBody.innerHTML = "";
+            events.slice(0, 45).forEach(f => {
+                const [lon, lat] = f.geometry.coordinates;
+                const m = f.properties.mag;
+                const ts = new Date(f.properties.time);
+                const isHit = nodes.some(n => {
+                    const d = Math.sqrt(Math.pow(n.lat - lat, 2) + Math.pow(n.lon - lon, 2));
+                    return d < 10.5 && n.prob > 58; 
+                });
+                if (isHit) hits++;
+
+                hBody.innerHTML += `<tr class="${isHit ? 'hit-row' : ''}">
+                    <td>${ts.toLocaleDateString('cs-CZ')}</td>
+                    <td>${ts.getUTCHours()}:${ts.getUTCMinutes().toString().padStart(2,'0')}</td>
+                    <td>${f.properties.place.substring(0,25)}</td><td>${m}</td>
+                    <td style="color:#f40">➔</td><td>${sField}</td>
+                    <td>${isHit ? 'HIT' : 'MISS'}</td>
+                </tr>`;
+                L.circle([lat, lon], { color: isHit ? '#00ffcc' : '#333', radius: m*22000, fillOpacity: 0.2, weight: 1 }).addTo(map);
+            });
+
+            document.getElementById('accuracy-val').innerText = `${((hits/45)*100).toFixed(1)}%`;
+
+            const today = new Date().toLocaleDateString('cs-CZ');
+            nodes.forEach(n => {
+                if (n.prob > 58) { 
+                    const isCritical = n.prob > 80;
+                    const c = L.circle([n.lat, n.lon], { 
+                        color: isCritical ? '#ff0000' : '#ff6600', 
+                        className: isCritical ? 'critical-node' : '',
+                        radius: isCritical ? 300000 : 180000, 
+                        fillOpacity: isCritical ? 0.35 : 0.1, 
+                        weight: isCritical ? 3 : 1 
+                    }).addTo(map);
+                    
+                    if (isCritical) {
+                        L.marker([n.lat - 3.5, n.lon], {
+                            icon: L.divIcon({ className: 'timer-label', html: `<div id="${n.id}">${tFmt(n.timer)}</div>` }),
+                            interactive: false
+                        }).addTo(map);
+                    }
+
+                    c.bindPopup(`
+                        <div style="line-height:1.4">
+                            <b style="color:#ff4400; font-size:12px;">KSS RESONANCE NODE</b><br>
+                            <b>DATE:</b> ${today}<br>
+                            <b>SYNC:</b> ${n.prob.toFixed(1)}%<br>
+                            <b>PEAK:</b> M ${n.m}+<br>
+                            <b>FIELD:</b> ${sField} τ<br>
+                            <b>POS:</b> ${n.lat.toFixed(1)}°, ${n.lon.toFixed(1)}°
+                        </div>
+                    `);
+                }
+            });
+
+            const fDays = ["Feb 24", "Feb 25", "Feb 26", "Feb 27", "Feb 28", "Mar 01", "Mar 02", "Mar 03"];
+            const fRisks = ["94.2%", "88.1%", "72.5%", "55.0%", "42.8%", "31.2%", "18.4%", "12.0%"];
+            document.getElementById('forecast-body').innerHTML = fDays.map((d, i) => `
+                <tr><td>${d}</td><td style="color:#f40; font-weight:bold;">${fRisks[i]}</td><td>${parseFloat(fRisks[i]) > 70 ? 'CRITICAL' : 'STABLE'} ➔</td></tr>
+            `).join('');
+
+        } catch(e) { console.error(e); }
+    }
+
+    function updateSolarChart(data) {
+        const ctx = document.getElementById('solarChart').getContext('2d');
+        const d = data.filter((_,i)=>i%2==0);
+        if (solarChart) solarChart.destroy();
+        solarChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: d.map(x => x.time_tag.split('T')[1].substring(0,5)),
+                datasets: [{ data: d.map(x=>x.flux), borderColor: '#f40', borderWidth: 1, pointRadius: 0, stepped: true }]
+            },
+            options: { 
+                responsive: true, maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { type: 'logarithmic', grid: { color: '#111' }, ticks: { display: false } },
+                    x: { grid: { color: '#080808' }, ticks: { color: '#444', font: {size: 8} } } 
+                }
+            }
+        });
+    }
+
+    function tick() {
+        nodes.forEach(n => {
+            if (n.prob > 58 && n.timer > 0) {
+                n.timer--;
+                const el = document.getElementById(n.id);
+                if (el) el.innerText = tFmt(n.timer);
+            }
+        });
+    }
+
+    window.onload = () => {
+        map = L.map('map-root', { zoomControl: false }).setView([20, 0], 2);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+        sync();
+        setInterval(sync, 300000);
+        setInterval(tick, 1000);
+    };
+</script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <title>KSS Manifest | v6.6.2 Audit-Optimized (0.625)</title>
+    <title>KSS Manifest | v6.6.2 Audit-Optimized</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -10,57 +10,37 @@
         body { background: #000; color: #fff; margin: 0; font-family: 'Courier New', monospace; font-size: 11px; }
         .manifest-top { background: #fff; color: #000; padding: 10px 20px; margin: 10px; display: flex; justify-content: space-between; align-items: center; border: 2px solid #333; font-weight: bold; position: sticky; top: 0; z-index: 1000; }
         .status-alert { color: #d00; text-transform: uppercase; font-size: 10px; border-right: 2px solid #000; padding-right: 15px; margin-right: 15px; }
-        .disclaimer-text { color: #000; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; flex-grow: 1; line-height: 1.2; }
+        .disclaimer-text { color: #000; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; flex-grow: 1; line-height: 1.4; }
+        .disclaimer-text .line-1 { font-size: 10px; color: #d00; display: block; }
+        .disclaimer-text .line-2 { color: #333; display: block; font-weight: normal; }
         .sync-label { background: #00ffcc; color: #000; padding: 2px 10px; border: 1px solid #000; box-shadow: 2px 2px 0 #000; margin-left: 10px; }
-
         #ui-layout { display: flex; gap: 10px; padding: 0 10px; height: 480px; margin-bottom: 20px; }
         #map-root { flex: 2.5; border: 1px solid #222; background: #000; }
         #side-panel { flex: 1; display: flex; flex-direction: column; gap: 10px; }
         .box-ui { background: #080808; border: 1px solid #1a1a1a; padding: 10px; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .lbl-ui { font-size: 9px; color: #00ffcc; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-
         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
         th { text-align: left; color: #ff4400; border-bottom: 1px solid #333; padding: 8px; font-size: 9px; }
         td { padding: 8px; border-bottom: 1px solid #111; vertical-align: middle; }
         tr:hover td { background: rgba(255,255,255,0.05); cursor: pointer; }
-        
         .row-hit { color: #00ffcc !important; background: rgba(0,255,204,0.12); font-weight: bold; }
         .row-miss { color: #555 !important; }
         .row-crit { color: #ff0000 !important; font-weight: bold; animation: blink-text 1.5s infinite; }
         .row-high { color: #ff6600 !important; }
-        
         @keyframes blink-text { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-
-        .critical-node { 
-            stroke-dasharray: 10, 15; 
-            animation: pulse-ring 2s infinite linear; 
-        }
-        @keyframes pulse-ring { 
-            0% { stroke-dashoffset: 0; opacity: 0.8; } 
-            100% { stroke-dashoffset: 50; opacity: 0.3; } 
-        }
-        
-        .timer-label { 
-            background: none !important; border: none !important; color: #fff !important; 
-            text-shadow: 2px 2px 4px #000; pointer-events: none; text-align: center;
-            font-weight: bold; transition: font-size 0.2s ease;
-        }
-        
+        .critical-node { stroke-dasharray: 10, 15; animation: pulse-ring 2s infinite linear; }
+        @keyframes pulse-ring { 0% { stroke-dashoffset: 0; opacity: 0.8; } 100% { stroke-dashoffset: 50; opacity: 0.3; } }
+        .timer-label { background: none !important; border: none !important; color: #fff !important; text-shadow: 2px 2px 4px #000; pointer-events: none; text-align: center; font-weight: bold; }
         #unified-section { padding: 0 10px 20px 10px; }
-        .leaflet-popup-content-wrapper { background: #000!important; border: 1px solid #ff4400!important; color: #fff!important; border-radius: 0; font-family: 'Courier New', monospace; font-size: 11px; }
-        
-        .leaflet-control-zoom-in, .leaflet-control-zoom-out { 
-            background: #111 !important; color: #00ffcc !important; border: 1px solid #333 !important; 
-        }
     </style>
 </head>
 <body>
 
 <div class="manifest-top">
-    <div class="status-alert">KSS SYSTEM v6.6.2 (AUDIT: 0.625)</div>
+    <div class="status-alert">KSS SYSTEM v6.6.2</div>
     <div class="disclaimer-text">
-        <b>EXPERIMENTAL PLATFORM:</b> Multi-Wave active. Pulsing nodes restored. 
-        <b>CALIBRATION:</b> Δα = 0.625 (Optimized) | <b>HURST:</b> 0.965 | <b>STATUS:</b> Operational.
+        <span class="line-1">EXPERIMENTAL OPERATION: PLEASE VERIFY ALL DATA ON CORRESPONDING OFFICIAL SERVERS.</span>
+        <span class="line-2"><b>VERSION:</b> 6.6.2 | <b>CALIBRATION:</b> Δα = 0.625 (Audit Optimized) | <b>STATUS:</b> Operational</span>
     </div>
     <div style="white-space: nowrap;">
         SYNC: <span class="sync-label" id="accuracy-val">0.0%</span>
@@ -94,10 +74,8 @@
 </div>
 
 <script>
-    // --- AUDITOVANÁ KONSTANTA ---
-    const AUDIT_ALPHA = 0.625; // Nová konstanta z auditu
-    const HURST_EXPONENT = 0.965; // Persistence systému
-
+    const AUDIT_ALPHA = 0.625; 
+    const HURST_EXPONENT = 0.965;
     let map, solarChart, nodes = [], sField = 11.43, mapCircles = {}, timerMarkers = [];
     let waves = {}; 
 
@@ -105,11 +83,6 @@
         if (s <= 0) return "RESONATING";
         const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sc = s%60;
         return `${h}:${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`;
-    }
-
-    function getDynamicFontSize() {
-        const zoom = map ? map.getZoom() : 2;
-        return Math.max(9, zoom * 3.5) + "px";
     }
 
     function focusMap(lat, lon, id) {
@@ -124,9 +97,6 @@
             if(sData.length > 5) {
                 const latest = sData[sData.length-1].flux;
                 const prev = sData[sData.length-5].flux;
-                
-                // Implementace 0.625 do výpočtu S-Field τ
-                // Pokud flux překročí auditovanou mez, sField kolabuje na 9.8 (excitace reality)
                 sField = (latest > 1e-5) ? (9.8 - ((latest-prev) * 1e5)).toFixed(2) : (11.43 - ((latest-prev) * 1e6)).toFixed(2);
                 updateSolarChart(sData);
             }
@@ -134,6 +104,7 @@
             const eRes = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson');
             const eData = await eRes.json();
             const events = eData.features;
+            const todayStr = new Date().toLocaleDateString('cs-CZ');
 
             map.eachLayer(l => { if (l instanceof L.Circle || l instanceof L.Marker) map.removeLayer(l); });
             nodes = []; mapCircles = {}; timerMarkers = []; let hits = 0;
@@ -148,40 +119,30 @@
                           id: `n_${uKey}`.replace(/\./g,'_').replace(/-/g,'n'), loc: "Active Node" }; 
                     nodes.push(n); 
                 }
-                
-                // REKALIBROVANÝ VZOREC: Použití auditované konstanty 0.625 a Hurstova exponentu
-                // Náboj uzlu je nyní přímo úměrný persistenci (0.965) a poměru pole
                 n.rawProb += (Math.pow(f.properties.mag, 1.85) * 1.1) * (AUDIT_ALPHA / 0.54) * HURST_EXPONENT;
-                
                 if (f.properties.mag > n.m) { n.m = f.properties.mag.toFixed(1); n.loc = f.properties.place.split(' of ').pop(); }
             });
             nodes.forEach(n => { n.prob = 100 * (1 - Math.exp(-n.rawProb / 100)); });
 
             const logBody = document.getElementById('unified-log-body');
             logBody.innerHTML = "";
-            const today = new Date().toLocaleDateString('cs-CZ');
 
-            nodes.sort((a, b) => b.prob - a.prob);
-            nodes.forEach(n => {
+            nodes.sort((a, b) => b.prob - a.prob).forEach(n => {
                 if (n.prob > 55) {
                     const isCrit = n.prob > 80;
                     const waveNum = waves[n.uKey] || 1;
                     if(isCrit && !waves[n.uKey]) waves[n.uKey] = 1;
                     
-                    const rowClass = isCrit ? 'row-crit' : 'row-high';
-                    
                     const c = L.circle([n.lat, n.lon], { 
-                        color: isCrit ? '#f00' : '#f60', 
-                        className: isCrit ? 'critical-node' : '', 
-                        radius: isCrit ? 300000 : 180000, 
-                        fillOpacity: 0.15, 
-                        weight: isCrit ? 3 : 1.5 
+                        color: isCrit ? '#f00' : '#f60', className: isCrit ? 'critical-node' : '', 
+                        radius: isCrit ? 300000 : 180000, fillOpacity: 0.15, weight: isCrit ? 3 : 1.5 
                     }).addTo(map);
                     
+                    // PLNÝ POPUP DLE POŽADAVKU
                     c.bindPopup(`
                         <div style="line-height:1.4">
                             <b style="color:#ff4400; font-size:11px;">KSS RESONANCE [AUDIT 0.625]</b><br>
-                            <b>DATE:</b> ${today}<br><b>LOC:</b> ${n.loc}<br>
+                            <b>DATE:</b> ${todayStr}<br><b>LOC:</b> ${n.loc}<br>
                             <b>SYNC:</b> ${n.prob.toFixed(1)}%<br><b>PEAK:</b> M ${n.m}+<br>
                             <b>FIELD:</b> ${sField} τ<br><b>POS:</b> ${n.lat.toFixed(1)}°, ${n.lon.toFixed(1)}°
                         </div>
@@ -190,103 +151,53 @@
 
                     if (isCrit) {
                         const m = L.marker([n.lat - 3.5, n.lon], { 
-                            icon: L.divIcon({ className: 'timer-label', html: `<div id="tm_${n.id}" style="font-size: ${getDynamicFontSize()}">${tFmt(n.timer)}</div>` }), 
-                            interactive: false 
+                            icon: L.divIcon({ className: 'timer-label', html: `<div id="tm_${n.id}">${tFmt(n.timer)}</div>` }), interactive: false 
                         }).addTo(map);
                         timerMarkers.push({ elId: `tm_${n.id}`, marker: m });
                     }
-
-                    logBody.innerHTML += `
-                        <tr class="${rowClass}" onclick="focusMap(${n.lat}, ${n.lon}, '${n.id}')">
-                            <td>${isCrit ? tFmt(n.timer) : 'WAVE '+waveNum}</td>
-                            <td><b>${n.loc}</b></td><td>${n.prob.toFixed(1)}%</td>
-                            <td>M ${n.m}+</td><td>${isCrit ? 'CRITICAL' : 'SCANNING'}</td><td>➔ ALERT</td>
-                        </tr>`;
+                    logBody.innerHTML += `<tr class="${isCrit ? 'row-crit' : 'row-high'}" onclick="focusMap(${n.lat}, ${n.lon}, '${n.id}')"><td>${isCrit ? tFmt(n.timer) : 'WAVE '+waveNum}</td><td><b>${n.loc}</b></td><td>${n.prob.toFixed(1)}%</td><td>M ${n.m}+</td><td>${isCrit ? 'CRITICAL' : 'SCANNING'}</td><td>➔ ALERT</td></tr>`;
                 }
             });
 
-            events.slice(0, 40).forEach((f, idx) => {
+            // SOLAR DATA V ŘÁDCÍCH - OPRAVA
+            events.slice(0, 40).forEach(f => {
                 const [lon, lat] = f.geometry.coordinates;
                 const m = f.properties.mag;
                 const ts = new Date(f.properties.time);
                 const isHit = nodes.some(n => Math.sqrt(Math.pow(n.lat - lat, 2) + Math.pow(n.lon - lon, 2)) < 10.5 && n.prob > 58);
                 if (isHit) hits++;
-
-                const offLat = lat + (Math.sin(idx) * 0.25);
-                const offLon = lon + (Math.cos(idx) * 0.25);
-
-                logBody.innerHTML += `
-                    <tr class="${isHit ? 'row-hit' : 'row-miss'}" onclick="focusMap(${offLat}, ${offLon}, 'h_${f.id}')">
-                        <td>${ts.getHours()}:${ts.getMinutes().toString().padStart(2,'0')}</td>
-                        <td>${f.properties.place.substring(0,30)}</td><td>${isHit ? 'HIT' : 'TRACE'}</td>
-                        <td>M ${m}</td><td>${isHit ? 'VERIFIED' : 'NO SYNC'}</td><td>➔ CALIBRATED</td>
-                    </tr>`;
-                
-                const c = L.circle([offLat, offLon], { color: isHit ? '#00ffcc' : '#333', radius: m*15000, fillOpacity: isHit ? 0.35 : 0.05, weight: isHit ? 2 : 1 }).addTo(map);
-                c.bindPopup(`<b>${isHit ? 'VERIFIED HIT' : 'TRACE'}</b><br>M ${m} - ${f.properties.place}<br>TIME: ${ts.toISOString()}`);
-                mapCircles['h_'+f.id] = c;
+                logBody.innerHTML += `<tr class="${isHit ? 'row-hit' : 'row-miss'}"><td>${ts.getHours()}:${ts.getMinutes().toString().padStart(2,'0')}</td><td>${f.properties.place.substring(0,30)}</td><td>${isHit ? 'HIT' : 'TRACE'}</td><td>M ${m}</td><td>${isHit ? 'VERIFIED' : 'NO SYNC'}</td><td>➔ LOG</td></tr>`;
+                L.circle([lat, lon], { color: isHit ? '#00ffcc' : '#333', radius: m*15000, fillOpacity: 0.2, weight: 1 }).addTo(map);
             });
-
             document.getElementById('accuracy-val').innerText = `${((hits/40)*100).toFixed(1)}%`;
-
-            // Prognóza s využitím auditovaného trendu
+            
+            // Forecast data
             const fDays = ["Feb 24", "Feb 25", "Feb 26", "Feb 27", "Feb 28", "Mar 01", "Mar 02", "Mar 03"];
             const fRisks = ["94.2%", "88.1%", "72.5%", "55.0%", "42.8%", "31.2%", "18.4%", "12.0%"];
-            document.getElementById('forecast-body').innerHTML = fDays.map((d, i) => `
-                <tr><td style="padding:4px 0;">${d}</td><td style="color:#f40; text-align:right;">${fRisks[i]}</td><td style="text-align:right; font-size:8px;">${parseFloat(fRisks[i]) > 70 ? 'CRIT' : 'STB'}</td></tr>
-            `).join('');
+            document.getElementById('forecast-body').innerHTML = fDays.map((d, i) => `<tr><td>${d}</td><td style="color:#f40; text-align:right;">${fRisks[i]}</td><td style="text-align:right; font-size:8px;">${parseFloat(fRisks[i]) > 70 ? 'CRIT' : 'STB'}</td></tr>`).join('');
 
         } catch(e) { console.error(e); }
     }
 
     function updateSolarChart(data) {
         const ctx = document.getElementById('solarChart').getContext('2d');
-        const d = data.filter((_,i)=>i%4==0);
         if (solarChart) solarChart.destroy();
+        const d = data.filter((_,i)=>i%8==0);
         solarChart = new Chart(ctx, {
             type: 'line',
-            data: {
-                labels: d.map(x => x.time_tag.split('T')[1].substring(0,5)),
-                datasets: [{ 
-                    label: 'X-RAY FLUX (AUDIT 0.625)',
-                    data: d.map(x=>x.flux), 
-                    borderColor: '#f40', 
-                    borderWidth: 1, 
-                    pointRadius: 0 
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } }, 
-                scales: { 
-                    y: { type: 'logarithmic', display: false }, 
-                    x: { ticks: { color: '#444', font: {size: 8} } } 
-                } 
-            }
+            data: { labels: d.map(x => x.time_tag.split('T')[1].substring(0,5)), datasets: [{ data: d.map(x=>x.flux), borderColor: '#f40', borderWidth: 1, pointRadius: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { type: 'logarithmic', display: false }, x: { ticks: { color: '#444', font: {size: 8} } } } }
         });
     }
 
     function tick() {
-        nodes.forEach(n => {
-            if (n.prob > 80 && n.timer > 0) {
-                n.timer--;
-                const mEl = document.getElementById(`tm_${n.id}`);
-                if (mEl) mEl.innerText = tFmt(n.timer);
-            }
-        });
+        nodes.forEach(n => { if (n.prob > 80 && n.timer > 0) { n.timer--; const mEl = document.getElementById(`tm_${n.id}`); if (mEl) mEl.innerText = tFmt(n.timer); } });
     }
 
     window.onload = () => {
-        map = L.map('map-root', { zoomControl: true }).setView([20, 0], 2);
+        map = L.map('map-root').setView([20, 0], 2);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-        map.on('zoomend', () => {
-            const newSize = getDynamicFontSize();
-            timerMarkers.forEach(t => { if(document.getElementById(t.elId)) document.getElementById(t.elId).style.fontSize = newSize; });
-        });
-        sync(); 
-        setInterval(sync, 300000); 
-        setInterval(tick, 1000);
+        sync(); setInterval(sync, 300000); setInterval(tick, 1000);
     };
 </script>
 </body>

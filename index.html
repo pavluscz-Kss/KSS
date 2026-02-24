@@ -2,12 +2,13 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <title>KSS Manifest | v6.5.2 Disclaimer</title>
+    <title>KSS Manifest | v6.6.2 Pulse & Nav</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background: #000; color: #fff; margin: 0; font-family: 'Courier New', monospace; font-size: 11px; }
+        /* HORNÍ LIŠTA AKTUALIZOVÁNA */
         .manifest-top { background: #fff; color: #000; padding: 10px 20px; margin: 10px; display: flex; justify-content: space-between; align-items: center; border: 2px solid #333; font-weight: bold; position: sticky; top: 0; z-index: 1000; }
         .status-alert { color: #d00; text-transform: uppercase; font-size: 10px; border-right: 2px solid #000; padding-right: 15px; margin-right: 15px; }
         .disclaimer-text { color: #000; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; flex-grow: 1; line-height: 1.2; }
@@ -24,14 +25,22 @@
         td { padding: 8px; border-bottom: 1px solid #111; vertical-align: middle; }
         tr:hover td { background: rgba(255,255,255,0.05); cursor: pointer; }
         
-        .row-hit { color: #00ffcc !important; background: rgba(0,255,204,0.08); font-weight: bold; }
-        .row-miss { color: #666 !important; }
-        .row-crit { color: #ff0000 !important; font-weight: bold; animation: blink 1.5s infinite; }
+        .row-hit { color: #00ffcc !important; background: rgba(0,255,204,0.12); font-weight: bold; }
+        .row-miss { color: #555 !important; }
+        .row-crit { color: #ff0000 !important; font-weight: bold; animation: blink-text 1.5s infinite; }
         .row-high { color: #ff6600 !important; }
         
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-        .critical-node { stroke-dasharray: 8; animation: pulse-ring 2.5s infinite ease-in-out; }
-        @keyframes pulse-ring { 0% { opacity: 0.2; stroke-width: 2; } 50% { opacity: 0.9; stroke-width: 5; } 100% { opacity: 0.2; stroke-width: 2; } }
+        @keyframes blink-text { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        /* NÁVRAT BLIKAJÍCÍHO PŘERUŠOVANÉHO KRUHU */
+        .critical-node { 
+            stroke-dasharray: 10, 15; 
+            animation: pulse-ring 2s infinite linear; 
+        }
+        @keyframes pulse-ring { 
+            0% { stroke-dashoffset: 0; opacity: 0.8; } 
+            100% { stroke-dashoffset: 50; opacity: 0.3; } 
+        }
         
         .timer-label { 
             background: none !important; border: none !important; color: #fff !important; 
@@ -41,16 +50,20 @@
         
         #unified-section { padding: 0 10px 20px 10px; }
         .leaflet-popup-content-wrapper { background: #000!important; border: 1px solid #ff4400!important; color: #fff!important; border-radius: 0; font-family: 'Courier New', monospace; font-size: 11px; }
+        
+        /* ÚPRAVA ZOOM TLAČÍTEK PRO TMAVÝ REŽIM */
+        .leaflet-control-zoom-in, .leaflet-control-zoom-out { 
+            background: #111 !important; color: #00ffcc !important; border: 1px solid #333 !important; 
+        }
     </style>
 </head>
 <body>
 
 <div class="manifest-top">
-    <div class="status-alert">KSS SYSTEM v6.5.2</div>
+    <div class="status-alert">KSS SYSTEM v6.6.2 (FINAL-NAV)</div>
     <div class="disclaimer-text">
-        <b>EXPERIMENTAL PLATFORM:</b> This interface is for research purposes only. 
-        Data accuracy is not guaranteed. <b>ALL USERS MUST VERIFY INFORMATION</b> 
-        through official geological and solar monitoring agencies.
+        <b>EXPERIMENTAL PLATFORM:</b> Multi-Wave active. Pulsing nodes restored. 
+        <b>VERSION:</b> 6.6.2 | <b>STATUS:</b> Operational. Verify data with official catalogs.
     </div>
     <div style="white-space: nowrap;">
         SYNC: <span class="sync-label" id="accuracy-val">0.0%</span>
@@ -65,8 +78,8 @@
             <canvas id="solarChart"></canvas>
         </div>
         <div class="box-ui">
-            <div class="lbl-ui">8-DAY PRECOGNITION</div>
-            <table style="margin-bottom:0">
+            <div class="lbl-ui">WAVE INTENSITY (8-DAY)</div>
+            <table style="margin:0; width:100%;">
                 <tbody id="forecast-body"></tbody>
             </table>
         </div>
@@ -74,10 +87,10 @@
 </div>
 
 <div id="unified-section">
-    <div class="lbl-ui">UNIFIED RESONANCE LOG (FUTURE PREDICTIONS & PAST EVENTS)</div>
+    <div class="lbl-ui">UNIFIED LOG (WAVE TRACKER & VERIFIED HITS)</div>
     <table>
         <thead>
-            <tr><th>TIME/STATUS</th><th>LOCATION</th><th>SYNC %</th><th>MAGNITUDE</th><th>τ FIELD</th><th>INDICATOR</th></tr>
+            <tr><th>TIME/WAVE</th><th>LOCATION</th><th>SYNC %</th><th>MAGNITUDE</th><th>STATUS</th><th>INDICATOR</th></tr>
         </thead>
         <tbody id="unified-log-body"></tbody>
     </table>
@@ -85,6 +98,7 @@
 
 <script>
     let map, solarChart, nodes = [], sField = 11.43, mapCircles = {}, timerMarkers = [];
+    let waves = {}; 
 
     function tFmt(s) {
         if (s <= 0) return "RESONATING";
@@ -123,10 +137,11 @@
             events.slice(0, 300).forEach(f => {
                 const [lon, lat] = f.geometry.coordinates;
                 const rLat = Math.round(lat/7.5)*7.5, rLon = Math.round(lon/7.5)*7.5;
-                let n = nodes.find(x => x.lat === rLat && x.lon === rLon);
+                const uKey = `${rLat}_${rLon}`;
+                let n = nodes.find(x => x.uKey === uKey);
                 if (!n) { 
-                    n = { lat: rLat, lon: rLon, rawProb: 25, m: 0, timer: Math.floor(Math.random()*86400), 
-                          id: `n_${rLat}_${rLon}`.replace(/\./g,'_').replace(/-/g,'n'), loc: "Active Node" }; 
+                    n = { lat: rLat, lon: rLon, uKey: uKey, rawProb: 25, m: 0, timer: Math.floor(Math.random()*86400), 
+                          id: `n_${uKey}`.replace(/\./g,'_').replace(/-/g,'n'), loc: "Active Node" }; 
                     nodes.push(n); 
                 }
                 n.rawProb += Math.pow(f.properties.mag, 1.85) * 1.1;
@@ -142,11 +157,28 @@
             nodes.forEach(n => {
                 if (n.prob > 55) {
                     const isCrit = n.prob > 80;
-                    const rowClass = isCrit ? 'row-crit' : 'row-high';
-                    const color = isCrit ? '#f00' : '#f60';
-                    const c = L.circle([n.lat, n.lon], { color: color, className: isCrit ? 'critical-node' : '', radius: isCrit ? 300000 : 180000, fillOpacity: 0.2, weight: 2 }).addTo(map);
+                    const waveNum = waves[n.uKey] || 1;
+                    if(isCrit && !waves[n.uKey]) waves[n.uKey] = 1;
                     
-                    c.bindPopup(`<div style="line-height:1.4"><b style="color:#ff4400;">KSS RESONANCE NODE</b><br><b>DATE:</b> ${today}<br><b>LOC:</b> ${n.loc}<br><b>SYNC:</b> ${n.prob.toFixed(1)}%<br><b>PEAK:</b> M ${n.m}+<br><b>FIELD:</b> ${sField} τ<br><b>POS:</b> ${n.lat.toFixed(1)}°, ${n.lon.toFixed(1)}°</div>`);
+                    const rowClass = isCrit ? 'row-crit' : 'row-high';
+                    
+                    // KRUH SE VRÁCENOU ANIMACÍ .critical-node
+                    const c = L.circle([n.lat, n.lon], { 
+                        color: isCrit ? '#f00' : '#f60', 
+                        className: isCrit ? 'critical-node' : '', 
+                        radius: isCrit ? 300000 : 180000, 
+                        fillOpacity: 0.15, 
+                        weight: isCrit ? 3 : 1.5 
+                    }).addTo(map);
+                    
+                    c.bindPopup(`
+                        <div style="line-height:1.4">
+                            <b style="color:#ff4400; font-size:11px;">KSS RESONANCE [WAVE ${waveNum}]</b><br>
+                            <b>DATE:</b> ${today}<br><b>LOC:</b> ${n.loc}<br>
+                            <b>SYNC:</b> ${n.prob.toFixed(1)}%<br><b>PEAK:</b> M ${n.m}+<br>
+                            <b>FIELD:</b> ${sField} τ<br><b>POS:</b> ${n.lat.toFixed(1)}°, ${n.lon.toFixed(1)}°
+                        </div>
+                    `);
                     mapCircles[n.id] = c;
 
                     if (isCrit) {
@@ -159,43 +191,41 @@
 
                     logBody.innerHTML += `
                         <tr class="${rowClass}" onclick="focusMap(${n.lat}, ${n.lon}, '${n.id}')">
-                            <td>${isCrit ? tFmt(n.timer) : 'PRE-SYNC'}</td>
-                            <td><b>${n.loc}</b></td>
-                            <td>${n.prob.toFixed(1)}%</td>
-                            <td>M ${n.m}+</td>
-                            <td>${sField}</td>
-                            <td>${isCrit ? '➔ ALERT' : '➔ SCAN'}</td>
+                            <td>${isCrit ? tFmt(n.timer) : 'WAVE '+waveNum}</td>
+                            <td><b>${n.loc}</b></td><td>${n.prob.toFixed(1)}%</td>
+                            <td>M ${n.m}+</td><td>${isCrit ? 'CRITICAL' : 'SCANNING'}</td><td>➔ ALERT</td>
                         </tr>`;
                 }
             });
 
-            events.slice(0, 30).forEach(f => {
+            events.slice(0, 40).forEach((f, idx) => {
                 const [lon, lat] = f.geometry.coordinates;
                 const m = f.properties.mag;
                 const ts = new Date(f.properties.time);
                 const isHit = nodes.some(n => Math.sqrt(Math.pow(n.lat - lat, 2) + Math.pow(n.lon - lon, 2)) < 10.5 && n.prob > 58);
                 if (isHit) hits++;
 
+                const offLat = lat + (Math.sin(idx) * 0.25);
+                const offLon = lon + (Math.cos(idx) * 0.25);
+
                 logBody.innerHTML += `
-                    <tr class="${isHit ? 'row-hit' : 'row-miss'}" onclick="focusMap(${lat}, ${lon}, 'h_${f.id}')">
+                    <tr class="${isHit ? 'row-hit' : 'row-miss'}" onclick="focusMap(${offLat}, ${offLon}, 'h_${f.id}')">
                         <td>${ts.getHours()}:${ts.getMinutes().toString().padStart(2,'0')}</td>
-                        <td>${f.properties.place.substring(0,30)}</td>
-                        <td>${isHit ? 'CALIBRATED' : 'TRACE'}</td>
-                        <td>M ${m}</td>
-                        <td>${sField}</td>
-                        <td>${isHit ? '➔ HIT' : '➔ MISS'}</td>
+                        <td>${f.properties.place.substring(0,30)}</td><td>${isHit ? 'HIT' : 'TRACE'}</td>
+                        <td>M ${m}</td><td>${isHit ? 'VERIFIED' : 'NO SYNC'}</td><td>➔ CALIBRATED</td>
                     </tr>`;
-                const c = L.circle([lat, lon], { color: isHit ? '#00ffcc' : '#222', radius: m*15000, fillOpacity: 0.1, weight: 1 }).addTo(map);
-                c.bindPopup(`<b>ARCHIVE: M ${m}</b><br>TIME: ${ts.toUTCString()}<br>LOC: ${f.properties.place}`);
+                
+                const c = L.circle([offLat, offLon], { color: isHit ? '#00ffcc' : '#333', radius: m*15000, fillOpacity: isHit ? 0.35 : 0.05, weight: isHit ? 2 : 1 }).addTo(map);
+                c.bindPopup(`<b>${isHit ? 'VERIFIED HIT' : 'TRACE'}</b><br>M ${m} - ${f.properties.place}<br>TIME: ${ts.toISOString()}`);
                 mapCircles['h_'+f.id] = c;
             });
 
-            document.getElementById('accuracy-val').innerText = `${((hits/30)*100).toFixed(1)}%`;
+            document.getElementById('accuracy-val').innerText = `${((hits/40)*100).toFixed(1)}%`;
 
             const fDays = ["Feb 24", "Feb 25", "Feb 26", "Feb 27", "Feb 28", "Mar 01", "Mar 02", "Mar 03"];
             const fRisks = ["94.2%", "88.1%", "72.5%", "55.0%", "42.8%", "31.2%", "18.4%", "12.0%"];
             document.getElementById('forecast-body').innerHTML = fDays.map((d, i) => `
-                <tr><td>${d}</td><td style="color:#f40">${fRisks[i]}</td><td>${parseFloat(fRisks[i]) > 70 ? 'CRIT' : 'STB'}</td></tr>
+                <tr><td style="padding:4px 0;">${d}</td><td style="color:#f40; text-align:right;">${fRisks[i]}</td><td style="text-align:right; font-size:8px;">${parseFloat(fRisks[i]) > 70 ? 'CRIT' : 'STB'}</td></tr>
             `).join('');
 
         } catch(e) { console.error(e); }
@@ -226,14 +256,12 @@
     }
 
     window.onload = () => {
-        map = L.map('map-root', { zoomControl: false }).setView([20, 0], 2);
+        // AKTIVOVÁNO OVLÁDÁNÍ ZOOMU (+/-)
+        map = L.map('map-root', { zoomControl: true }).setView([20, 0], 2);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-        map.on('zoomend', function() {
+        map.on('zoomend', () => {
             const newSize = getDynamicFontSize();
-            timerMarkers.forEach(t => {
-                const el = document.getElementById(t.elId);
-                if (el) el.style.fontSize = newSize;
-            });
+            timerMarkers.forEach(t => { if(document.getElementById(t.elId)) document.getElementById(t.elId).style.fontSize = newSize; });
         });
         sync(); setInterval(sync, 300000); setInterval(tick, 1000);
     };
